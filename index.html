@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>SmartBin Scanner</title>
-  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+  <script src="https://teachablemachine.withgoogle.com/models/model.js"></script>
+
 </head>
 
 <body style="text-align:center; font-family:sans-serif;">
@@ -18,7 +19,7 @@
   <div id="label-container" style="font-size:20px; margin-top:20px;"></div>
 
   <script>
-    const URL = "./model/";
+    const URL = "https://teachablemachine.withgoogle.com/models/GOXBSNNPM/";
     let model, webcam, labelContainer, maxPredictions;
 
     async function init() {
@@ -28,7 +29,7 @@
         const modelURL = URL + "model.json";
         const metadataURL = URL + "metadata.json";
 
-        model = await tmImage.load(modelURL, metadataURL);
+        model = await tmImage.load(URL + "model.json", URL + "metadata.json");
         maxPredictions = model.getTotalClasses();
 
         document.getElementById("status").innerText = "📷 Requesting camera...";
@@ -67,3 +68,4 @@
   </script>
 </body>
 </html>
+
