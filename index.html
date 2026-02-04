@@ -2,15 +2,15 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>SmartBin Plastic Scanner</title>
+  <title>SmartBin Scanner</title>
   <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
 </head>
+
 <body style="text-align:center; font-family:sans-serif;">
-
   <h1>SmartBin Scanner</h1>
-  <p>กดปุ่มเพื่อเปิดกล้องแล้วส่องขวดพลาสติก</p>
+  <p id="status">กดปุ่มเพื่อเปิดกล้อง</p>
 
-  <button onclick="init()" style="padding:10px 20px; font-size:18px;">
+  <button onclick="init()" style="padding:12px 22px; font-size:18px;">
     📷 Start Camera
   </button>
 
@@ -19,23 +19,34 @@
 
   <script>
     const URL = "./model/";
-
     let model, webcam, labelContainer, maxPredictions;
 
     async function init() {
-      const modelURL = URL + "model.json";
-      const metadataURL = URL + "metadata.json";
+      try {
+        document.getElementById("status").innerText = "⏳ Loading model...";
 
-      model = await tmImage.load(modelURL, metadataURL);
-      maxPredictions = model.getTotalClasses();
+        const modelURL = URL + "model.json";
+        const metadataURL = URL + "metadata.json";
 
-      webcam = new tmImage.Webcam(300, 300, true); // กล้องหน้า
-      await webcam.setup(); // ← ตรงนี้ทำให้มือถือถามสิทธิ์กล้อง
-      await webcam.play();
-      window.requestAnimationFrame(loop);
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
 
-      document.getElementById("webcam-container").appendChild(webcam.canvas);
-      labelContainer = document.getElementById("label-container");
+        document.getElementById("status").innerText = "📷 Requesting camera...";
+
+        webcam = new tmImage.Webcam(300, 300, true);
+        await webcam.setup();   // ← ตรงนี้มือถือควรถามสิทธิ์
+        await webcam.play();
+
+        document.getElementById("status").innerText = "✅ Camera Ready";
+
+        window.requestAnimationFrame(loop);
+        document.getElementById("webcam-container").appendChild(webcam.canvas);
+        labelContainer = document.getElementById("label-container");
+
+      } catch (error) {
+        document.getElementById("status").innerText = "❌ ERROR: " + error.message;
+        console.error(error);
+      }
     }
 
     async function loop() {
@@ -47,7 +58,6 @@
     async function predict() {
       const prediction = await model.predict(webcam.canvas);
       labelContainer.innerHTML = "";
-
       for (let i = 0; i < maxPredictions; i++) {
         labelContainer.innerHTML +=
           prediction[i].className + " : " +
@@ -55,6 +65,5 @@
       }
     }
   </script>
-
 </body>
 </html>
