@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <title>SmartBin Scanner</title>
-  <script src="https://teachablemachine.withgoogle.com/models/model.js"></script>
 
+  <!-- โหลด TensorFlow และ Teachable Machine -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
 </head>
 
 <body style="text-align:center; font-family:sans-serif;">
   <h1>SmartBin Scanner</h1>
   <p id="status">กดปุ่มเพื่อเปิดกล้อง</p>
 
-  <button onclick="init()" style="padding:12px 22px; font-size:18px;">
+  <button type="button" onclick="init()" style="padding:12px 22px; font-size:18px;">
     📷 Start Camera
   </button>
 
@@ -19,15 +21,14 @@
   <div id="label-container" style="font-size:20px; margin-top:20px;"></div>
 
   <script>
+    // 🔥 โมเดลของคุณ
     const URL = "https://teachablemachine.withgoogle.com/models/GOXBSNNPM/";
+
     let model, webcam, labelContainer, maxPredictions;
 
     async function init() {
       try {
         document.getElementById("status").innerText = "⏳ Loading model...";
-
-        const modelURL = URL + "model.json";
-        const metadataURL = URL + "metadata.json";
 
         model = await tmImage.load(URL + "model.json", URL + "metadata.json");
         maxPredictions = model.getTotalClasses();
@@ -35,18 +36,18 @@
         document.getElementById("status").innerText = "📷 Requesting camera...";
 
         webcam = new tmImage.Webcam(300, 300, true);
-        await webcam.setup();   // ← ตรงนี้มือถือควรถามสิทธิ์
+        await webcam.setup();
         await webcam.play();
-
-        document.getElementById("status").innerText = "✅ Camera Ready";
-
         window.requestAnimationFrame(loop);
+
         document.getElementById("webcam-container").appendChild(webcam.canvas);
         labelContainer = document.getElementById("label-container");
 
-      } catch (error) {
-        document.getElementById("status").innerText = "❌ ERROR: " + error.message;
-        console.error(error);
+        document.getElementById("status").innerText = "✅ Camera Ready";
+
+      } catch (err) {
+        document.getElementById("status").innerText = "❌ ERROR: " + err.message;
+        console.error(err);
       }
     }
 
@@ -68,4 +69,3 @@
   </script>
 </body>
 </html>
-
